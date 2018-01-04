@@ -3,8 +3,8 @@ from feature import Feature
 
 
 class LS350_Driver(Driver):
-    def __init__(self):
-        pass
+    def __init__(self, resource):
+        super().__init__(resource)
 
     @Feature()
     def identification(self):
