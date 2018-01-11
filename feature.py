@@ -29,6 +29,9 @@ class Feature(object):
         self.fget = None  # Getter function
         self.fset = None  # Setter function
 
+        self.get_validators = []
+        self.set_validators = []
+
     def __call__(self, func):
         if self.fget is None:
             return self.getter(func)
@@ -42,7 +45,16 @@ class Feature(object):
         return self
 
     def __get__(self, instance, owner):
-        return self.fget(instance)
+        for validator in self.set_validators:
+            validator.validate()
+
+        value = self.fget(instance)
+        for processor in self.get_processors:
+            value = processor.process(value)
+        return value
 
     def __set__(self, instance, value):
+        for validator in self.set_validators:
+            validator.validate(value)
+
         return self.fset(instance, value)
