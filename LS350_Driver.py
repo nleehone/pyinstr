@@ -98,7 +98,23 @@ class LS350_Driver(Driver):
     def get_setpoint(self, output):
         return self.query("SETP? {}".format(output))
 
+    def get_setpoint_celsius(self, output):
+        return self.get_setpoint(output) - 273.15
+
     @Write(validators={"output": [ValidateInteger(), ValidateInArray((1, 2, 3, 4))],
                        "value": ValidateReal()})
     def set_setpoint(self, output, value):
         self.send("SETP {},{}".format(output, value))
+
+    def set_setpoint_celsius(self, output, value):
+        # Assumes that the sensor units is set to Kelvin
+        self.set_setpoint(output, value + 273.15)
+
+    @Write(validators={"output": [ValidateInteger(), ValidateInArray((1, 2, 3, 4))],
+                       "on_off": ValidateInArray((0, 1)),
+                       "rate": [ValidateReal(), ValidateRange(min=0, max=100)]})
+    def set_setpoint_ramp_parameters(self, output, on_off, rate):
+        self.send("RAMP {},{},{}".format(output, on_off, rate))
+
+    def set_setpoint_ramping_off(self, output):
+        self.set_setpoint_ramp_parameters(output, 0, 0);
