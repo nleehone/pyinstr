@@ -26,7 +26,7 @@ timeout = 600  # seconds
 
 VTI_T_diff = 0  # K
 
-LS350_address = 'GPIB0::12::INSTR'
+LS350_address = 'ASRL9::INSTR'
 VTI_input = 'A'
 sample_input = 'B'
 VTI_output = 1
@@ -111,7 +111,7 @@ def set_temperature_and_settle(T_VTI, T_samp, T_range, settle_time, timeout, rec
 
         _, setp_VTI, T_VTI, S_VTI, setp_samp, T_samp, S_samp, p1, p2 = measure_temperature(record)
 
-        ramp_status = LS350.get_ramp_status()
+        ramp_status = LS350.get_ramp_status(2)
 
         if ramp_status != 0:
             logging.info('Timer reset because ramp still ongoing.')
