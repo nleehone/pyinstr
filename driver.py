@@ -29,7 +29,7 @@ class Query(Communication):
 
     def __call__(self, func):
         def query(*args):
-            self.validate(func, args)
+            self.validate(func, *args)
 
             # Run the query function
             val = func(*args)
@@ -57,6 +57,16 @@ class Write(Communication):
             # Write the data to the instrument
             func(*args)
         return write
+
+
+class NotSupported(Communication):
+    def __init__(self, message):
+        self.message = message
+
+    def __call__(self, func):
+        def not_supported(*args):
+            raise NotImplementedError(self.message)
+        return not_supported
 
 
 class DriverMeta(type):
