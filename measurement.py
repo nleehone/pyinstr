@@ -111,7 +111,12 @@ def set_temperature_and_settle(T_VTI, T_samp, T_range, settle_time, timeout, rec
 
         _, setp_VTI, T_VTI, S_VTI, setp_samp, T_samp, S_samp, p1, p2 = measure_temperature(record)
 
-        if abs(setp_samp - T_samp) <= T_range:
+        ramp_status = LS350.get_ramp_status()
+
+        if ramp_status != 0:
+            logging.info('Timer reset because ramp still ongoing.')
+            settled_timer = time()
+        elif abs(setp_samp - T_samp) <= T_range:
             if settle_time < time() - settled_timer:
                 settled = True
                 break
@@ -204,7 +209,7 @@ for i in range(2):
     logging.info('Sample ramp rate set to {} C/minute'.format(ramp_rate))
     LS350.set_setpoint_ramp_parameters(sample_output, 1, ramp_rate)
 
-    logging.info('Set temperature to {} C and wait for settle'.format(T_set))
+    logging.info('Set temperature to {} C and wait for settle'.format(T_room))
     file.write('INFO: Ramp BEGIN\n')  # Split the data file
     settled, timer = set_temperature_and_settle(T_room, T_room, T_range, settle_time, 3600, record=True)
     if not settled:
